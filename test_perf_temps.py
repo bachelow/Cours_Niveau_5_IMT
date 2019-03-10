@@ -40,7 +40,7 @@ def plot_results(data_folder,parametre,liste_a_tester,sub_folder,data_str):
 
 	liste_temps = []
 
-	# On créer le dossier de sauvegarde
+	# On crée le dossier de sauvegarde
 	saving_path = os.path.join(plot_result_folder,sub_folder) 
 	if not os.path.exists(saving_path):
 		os.makedirs(saving_path)
@@ -62,7 +62,7 @@ def plot_results(data_folder,parametre,liste_a_tester,sub_folder,data_str):
 
 		liste_temps.append(liste_temps_tempo)	
 
-	# On créer les dataframes
+	# On crée les dataframes
 	df_temps = pd.DataFrame(liste_temps)	
 	liste_df = [df_temps]
 

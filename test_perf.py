@@ -80,7 +80,7 @@ def plot_results(data_folder,parametre,liste_a_tester,sub_folder,data_str):
 
 	perf_list, diff_list, result_list = [],[],[]
 
-	# On créer le dossier de sauvegarde
+	# On crée le dossier de sauvegarde
 	saving_path = os.path.join(plot_result_folder,sub_folder) 
 	if not os.path.exists(saving_path):
 		os.makedirs(saving_path)
@@ -106,7 +106,7 @@ def plot_results(data_folder,parametre,liste_a_tester,sub_folder,data_str):
 		diff_list.append(diff_list_tempo)
 		perf_list.append(perf_list_tempo)	
 
-	# On créer les dataframes
+	# On crée les dataframes
 	df_result = pd.DataFrame(result_list)	
 	df_diff = pd.DataFrame(diff_list)	
 	df_perf = pd.DataFrame(perf_list)	
@@ -150,6 +150,7 @@ def plot_results(data_folder,parametre,liste_a_tester,sub_folder,data_str):
 ###### Main #####################################
 
 def main_test_function():
+	"""Automatise les tests"""
 
 	for j in range(len(test_serial_list)):
 
@@ -173,6 +174,7 @@ def main_test_function():
 
 
 def main_plot_function():
+	"""Automatise les créations des figures"""
 
 	for i in tqdm(range(len(liste_a_tester))):
 		if i == 0:
