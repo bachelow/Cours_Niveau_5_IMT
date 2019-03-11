@@ -1,0 +1,111 @@
+set N; # number of nodes
+
+param alpha; 
+/* hub-to-hub discount factor (multiplie le cout par ce dernier à chaque transition, ie quand on voyage de hub en hub, on a une prime à passer par les hubs) (0<alpha<1) */ 
+
+param f{i in N}; 
+/* fixed cost of locating a hub at node i */ 
+
+param cap{i in N}; 
+/* capacity of hub k */ 
+
+param w{i in N, j in N}; 
+/* amount of flow from node i to node j */ 
+
+param c{i in N, j in N}; 
+/* variable transfer cost of flow through the link from node i to node j */
+
+param O{i in N} := sum{j in N}w[i,j]; 
+/* total flow originating from node i */
+
+param D{i in N} := sum{j in N}w[j,i]; 
+/* total flow destination in node i */
+
+
+var p >=0, <=8, integer;
+/* number of hubs */
+
+var y{k in N, l in N}>=0, <=1, integer;
+/* y[k,l]=1 if (k,l) links two hubs, 0 otherwise */
+
+var z{i in N, k in N}>=0, <=1, integer;
+/* z[i,k]=1 if the spoke (node qui n'est pas un hub) i is allocated to the hub k, 0 otherwise */
+
+var x{i in N, k in N, l in N}integer, >=0;
+/* x[i,k,l] is the amount of flow with origin in i, traversing arc (k,l), 0 otherwise */
+
+
+
+minimize cost: sum{i in N}f[i]*z[i,i] + sum{i in N, j in N}(c[i,j]*O[i]+c[j,i]*D[i])*z[i,j]  +sum{i in N, k in N, m in N : m != k}alpha*c[k,m]*x[i,k,m]; 
+/* total costs (fixed cost --> première somme + variable cost --> les deux suivantes, eq 1 dans le papier) */
+
+
+s.t. singleAllocation{i in N}: sum{k in N} z[i,k]==1;
+
+s.t. pConstraint: sum{k in N} z[k,k]==p;
+
+s.t. hubLogicalStructure1{k in N, m in N : m>k}: z[k,m]+y[k,m]<=z[m,m];
+
+s.t. hubLogicalStructure2{k in N, m in N : m>k}: z[m,k]+y[k,m]<=z[k,k];
+
+s.t. transitOfFlowThroughTheTree{i in N, k in N, m in N : m>k}: x[i,k,m]+x[i,m,k]<=O[i]*y[k,m];
+
+s.t. flowConservation{i in N, k in N : k!=i}: O[i]*z[i,k]+sum{m in N : m!=k}x[i,m,k]==sum{m in N : m!=k}x[i,k,m]+sum{m in N}w[i,m]*z[m,k];
+
+s.t. treeStructure: sum{k in N, m in N}y[k,m]==p-1;
+
+s.t. capacity{k in N}: sum{i in N}(O[i]+D[i])*z[i,k]<=cap[k];
+
+
+solve;
+display cost;
+display p;
+display y;
+display z;
+
+
+data;
+set N := 1 2 3 4 5 6 7 8; 
+
+param w : 1 2 3 4 5 6 7 8 :=
+1 0 3032 1815 3364 2969 1698 2611 3597
+2 1276 0 3371 2437 1371 3094 3700 3456
+3 4022 3984 0 3360 2420 4107 2176 3091
+4 1719 3689 3401 0 1905 2831 2269 4196
+5 3902 3548 3174 2464 0 4044 3839 2644
+6 3474 3345 1694 1822 4148 0 1829 2749
+7 2978 3627 3324 3104 4020 4194 0 2450
+8 3535 2665 2485 2986 3930 1686 4015 0;
+
+param c : 1 2 3 4 5 6 7 8 :=
+1 0 32 29 30 10 15 28 17
+2 32 0 16 33 38 25 17 23
+3 29 16 0 32 40 27 24 26
+4 30 33 32 0 19 23 31 27
+5 10 38 40 19 0 33 17 32
+6 15 25 27 23 33 0 38 10
+7 28 17 24 31 17 38 0 30
+8 17 23 26 27 32 10 30 0;
+
+
+param alpha := 0.65; 
+
+param f := 1 325478
+2 420241
+3 324187
+4 324869
+5 532481
+6 387526
+7 334862
+8 388719;
+
+param cap :=1 95231
+2 137521
+3 62418
+4 61486
+5 83248
+6 131752
+7 63486
+8 98871;
+
+end;
